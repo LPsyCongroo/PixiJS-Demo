@@ -297,4 +297,12 @@ template {
 [hidden] {
   display: none; }
 
+.loading {
+  position: absolute;
+  top: 0;
+  right: 0;
+  color: white;
+  z-index: 100;
+  font-family: sans-serif; }
+
 /*# sourceMappingURL=main.css.map */
