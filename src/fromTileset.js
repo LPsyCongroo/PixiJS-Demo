@@ -1,27 +1,10 @@
 import * as PIXI from 'pixi.js';
+const { Application, loader, Sprite, utils, Rectangle } = PIXI;
 
-function importAll(r) {
-  const images = r
-    .keys()
-    .map((item) => r(item))
-    .sort((a, b) => {
-      a = parseInt(a.match(/\d/g).join(''));
-      b = parseInt(b.match(/\d/g).join(''));
-
-      if(a < b)
-        return -1;
-      else
-        return 1;
-    });
-  
-  return images;
-}
-
-const images = importAll(require.context('./images/dead', false, /\.(png|jpe?g|svg)$/));
-
+import tileset from './images/tileset.png';
 
 //Create a Pixi Application
-let app = new PIXI.Application({
+const app = new Application({
   width: window.innerWidth,     // default: 800
   height: window.innerHeight,   // default: 600
   antialias: true,              // default: false
@@ -35,77 +18,32 @@ app.view.style.display = 'block';
 //Add the canvas that Pixi automatically created for you to the HTML document
 document.body.appendChild(app.view);
 
-console.log(images);
-window.images = images;
 
-PIXI.loader
-  .add(images)
-  .on('progress', handleLoading)
+loader
+  .add(tileset)
   .load(setup);
 
-const loading = document.createElement('h1');
-loading.innerHTML = 'Loading...';
-loading.classList += 'loading';
-
-const loadbar = document.createElement('div');
-loadbar.classList += 'loadbar';
-document.body.appendChild(loadbar);
-
-function handleLoading(loader, resource) {
-  //Display the file `url` currently being loaded
-  console.log("loading: " + resource.url); 
-
-  //Display the percentage of files currently loaded
-  console.log("progress: " + loader.progress + "%"); 
-
-  loadbar.style.width = `${loader.progress}%`;
-
-  document.body.appendChild(loading);
-}
   
 function setup() {
-  setTimeout(() => {
-    document.body.removeChild(loading);
-    
-  }, 1000);  
+  // Create tileset sprite
+  const texture = utils.TextureCache[tileset];
 
-  let sprite = new PIXI.Sprite(
-    PIXI.loader.resources[images[0]].texture
-  );
+  // Define position and size of sub image
+  const rectangle = new Rectangle(192, 128, 64, 64);
 
-  // sprite.pivot.set(0.5, 0.5);
-  sprite.position.set(0, 0);
-  sprite.scale.x = 0.5;
-  sprite.scale.y = 0.5;
-  // sprite.anchor.set(0.5, 0.5);
-  // sprite.rotation = 0.5;
+  // Tell texture to use the rectangle defined section
+  texture.frame = rectangle;
 
-  app.stage.addChild(sprite);
+  // Create sprite from texture
+  const rocket = new Sprite(texture);
 
-  function animate(sprite, textures){
-    let index = 1;
+  rocket.x = 32;
+  rocket.y = 32;
 
-    let intervalID = setInterval(() => {
-      if(index === textures.length)
-        // index = 0;
-        return clearInterval(intervalID);
-      
-      sprite.texture = PIXI.utils.TextureCache[textures[index]];
-      index += 1;
-      
-    }, 1000/15)    
-  }
+  // Add the rocket to the stage
+  app.stage.addChild(rocket);
 
-  const restart = document.createElement('button');
-  restart.onclick = animate.bind(this, sprite, images);
-  restart.innerHTML = 'Restart';
-  restart.style.position = 'absolute';
-  document.body.appendChild(restart);
-
-
-  animate(sprite, images);
-  // sprite.texture = PIXI.utils.TextureCache[images[10]];
-
+  // Render the stage
+  app.renderer.render(app.stage);
 }
-
 
