@@ -21,7 +21,7 @@ const images = importAll(require.context('./images/dead', false, /\.(png|jpe?g|s
 
 
 //Create a Pixi Application
-let app = new PIXI.Application({
+const app = new PIXI.Application({
   width: window.innerWidth,     // default: 800
   height: window.innerHeight,   // default: 600
   antialias: true,              // default: false
@@ -34,9 +34,6 @@ app.view.style.display = 'block';
 
 //Add the canvas that Pixi automatically created for you to the HTML document
 document.body.appendChild(app.view);
-
-console.log(images);
-window.images = images;
 
 PIXI.loader
   .add(images)
